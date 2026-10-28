@@ -20,7 +20,7 @@ const Playground = {
         <div class="preview-well"><iframe title="Isolated CSS practice preview" sandbox="" referrerpolicy="no-referrer" loading="eager"></iframe></div>
       </section>`;
     const editor = host.querySelector('textarea');
-    const frame = host.querySelector('iframe');
+    let frame = host.querySelector('iframe');
     const status = host.querySelector('.playground-status');
     let revision = 0;
     frame.dataset.revision = '0';
@@ -28,8 +28,13 @@ const Playground = {
     editor.value = starter;
     const apply = () => {
       revision++;
-      frame.dataset.revision = String(revision);
-      frame.srcdoc = this.document(step.demo.html, editor.value, revision);
+      // Replace the opaque-origin frame rather than navigating an existing srcdoc.
+      // This also discards any prior native control or scrolling state reliably.
+      const nextFrame = frame.cloneNode(false);
+      nextFrame.dataset.revision = String(revision);
+      nextFrame.srcdoc = this.document(step.demo.html, editor.value, revision);
+      frame.replaceWith(nextFrame);
+      frame = nextFrame;
       status.textContent = 'CSS applied. Inspect the preview; invalid CSS may be ignored by the browser.';
     };
     frame.srcdoc = this.document(step.demo.html, starter);

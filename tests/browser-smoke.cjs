@@ -20,10 +20,10 @@ assert.ok(['chromium', 'firefox'].includes(engineName), 'Choose chromium or fire
     response.end(fs.readFileSync(path.join(root, relative)));
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-  let browser;
+  let browser, page;
   try {
     browser = await engines[engineName].launch({ headless: true, ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}) });
-    const page = await browser.newPage();
+    page = await browser.newPage();
     const waitForPreview = async () => {
       const revision = await page.locator('iframe').getAttribute('data-revision');
       await page.frameLocator('iframe').locator(`body[data-preview-revision="${revision}"]`).waitFor();
@@ -154,6 +154,19 @@ assert.ok(['chromium', 'firefox'].includes(engineName), 'Choose chromium or fire
     assert.equal(await page.locator('#search').evaluate(node => getComputedStyle(node).outlineStyle), 'solid');
     assert.deepEqual(errors, []);
     console.log('Browser smoke passed: 23 chapters/quizzes, all 23 worked CSS fixtures, retry, storage, reset, search, filters, mobile width, and capstone preferences/keyboard/print.');
+  } catch (error) {
+    if (page) {
+      console.error('Failure location:', page.url(), await page.locator('#chapter-title').textContent().catch(() => 'capstone'));
+      console.error('Preview markers:', await page.locator('iframe').evaluateAll(frames => frames.map(frame => ({ revision: frame.dataset.revision, sourceLength: frame.srcdoc.length }))));
+      for (const frame of page.frames().filter(frame => frame.parentFrame())) {
+        console.error('Frame body:', await frame.locator('body').evaluate(node => node.outerHTML.slice(0, 600)).catch(() => 'unavailable'));
+      }
+      if (process.env.CAPTURE_SCREENSHOTS) {
+        fs.mkdirSync('test-results', { recursive: true });
+        await page.screenshot({ path: `test-results/${engineName}-failure.png`, fullPage: true }).catch(() => {});
+      }
+    }
+    throw error;
   } finally {
     if (browser) await browser.close();
     await new Promise(resolve => server.close(resolve));
