@@ -1,8 +1,8 @@
 // Each practice frame is a script-free, opaque-origin document with blocked network access.
 const Playground = {
-  document(html, css) {
+  document(html, css, revision = 0) {
     const safeCSS = css.replace(/<\/style/gi, '<\\/style');
-    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src 'none'; font-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'"><style>*,*::before,*::after{box-sizing:border-box}body{margin:0;padding:16px;font:16px/1.5 system-ui,sans-serif;color:#172554;background:white}button,input,select,textarea{font:inherit}</style><style>${safeCSS}</style></head><body>${html}</body></html>`;
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src 'none'; font-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'"><style>*,*::before,*::after{box-sizing:border-box}body{margin:0;padding:16px;font:16px/1.5 system-ui,sans-serif;color:#172554;background:white}button,input,select,textarea{font:inherit}</style><style>${safeCSS}</style></head><body data-preview-revision="${revision}">${html}</body></html>`;
   },
   mount(step, container) {
     if (!step.demo) return;
@@ -22,10 +22,14 @@ const Playground = {
     const editor = host.querySelector('textarea');
     const frame = host.querySelector('iframe');
     const status = host.querySelector('.playground-status');
+    let revision = 0;
+    frame.dataset.revision = '0';
     const starter = '/* Write your CSS here, then choose Apply CSS. */';
     editor.value = starter;
     const apply = () => {
-      frame.srcdoc = this.document(step.demo.html, editor.value);
+      revision++;
+      frame.dataset.revision = String(revision);
+      frame.srcdoc = this.document(step.demo.html, editor.value, revision);
       status.textContent = 'CSS applied. Inspect the preview; invalid CSS may be ignored by the browser.';
     };
     frame.srcdoc = this.document(step.demo.html, starter);

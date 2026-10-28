@@ -24,6 +24,10 @@ assert.ok(['chromium', 'firefox'].includes(engineName), 'Choose chromium or fire
   try {
     browser = await engines[engineName].launch({ headless: true, ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}) });
     const page = await browser.newPage();
+    const waitForPreview = async () => {
+      const revision = await page.locator('iframe').getAttribute('data-revision');
+      await page.frameLocator('iframe').locator(`body[data-preview-revision="${revision}"]`).waitFor();
+    };
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(`http://127.0.0.1:${server.address().port}`);
@@ -46,10 +50,8 @@ assert.ok(['chromium', 'firefox'].includes(engineName), 'Choose chromium or fire
         if (step.demo) {
           await page.frameLocator('iframe').locator('body').waitFor();
           await page.locator('summary').click();
-          const navigation = page.waitForEvent('framenavigated', frame => frame.parentFrame() === page.mainFrame());
           await page.locator('.try-solution').click();
-          const appliedFrame = await navigation;
-          await appliedFrame.waitForLoadState('domcontentloaded');
+          await waitForPreview();
           const preview = page.frameLocator('iframe');
           for (const check of step.demo.checks) {
             const element = preview.locator(check.selector).first();
@@ -61,10 +63,25 @@ assert.ok(['chromium', 'firefox'].includes(engineName), 'Choose chromium or fire
             }
           }
           assert.equal(await page.locator('iframe').getAttribute('sandbox'), '');
+          const fullWidth = (await page.locator('iframe').boundingBox()).width;
           await page.locator('#preview-width').focus();
           await page.locator('#preview-width').press('Home');
           assert.equal(await page.locator('#preview-width-value').innerText(), '40%');
+          assert.ok((await page.locator('iframe').boundingBox()).width < fullWidth);
           await page.locator('#preview-width').press('End');
+          if (chapter.id === 1) {
+            await page.locator('#css-editor').fill('.panel p { color: rgb(1, 2, 3); }');
+            await page.locator('.apply-css').click();
+            await waitForPreview();
+            assert.equal(await preview.locator('.panel p').evaluate(node => getComputedStyle(node).color), 'rgb(1, 2, 3)');
+            const denied = await preview.locator('body').evaluate(() => {
+              try { void parent.document; return false; } catch (error) { return error.name === 'SecurityError'; }
+            });
+            assert.equal(denied, true, 'preview must not access the host document');
+            await page.locator('.reset-css').click();
+            await waitForPreview();
+            assert.match(await page.locator('#css-editor').inputValue(), /Write your CSS/);
+          }
         }
         if (step.type === 'question') {
           assert.equal(await page.locator('#next-btn').isDisabled(), true);

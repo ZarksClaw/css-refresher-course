@@ -371,7 +371,7 @@ body {
       { question: "What does <code>font-weight: 400</code> correspond to?", options: ["light", "normal", "bold", "bolder"], correct: 1, explanation: "400 is normal weight. 700 is bold. Other numeric weights depend on the font’s available faces or variable-font axis; 500 commonly denotes medium and 600 semibold." },
       { question: "What does <code>background-size: contain</code> do?", options: ["Fills the element entirely, cropping if needed", "Scales the image to fit inside the element without cropping", "Repeats the image", "Stretches the image"], correct: 1, explanation: "contain scales the image to fit entirely within the element (may leave empty space). cover fills the element (may crop)." },
       { question: "Which property changes text to ALL CAPS?", options: ["text-transform: uppercase", "font-variant: all-caps", "text-decoration: uppercase", "letter-spacing: caps"], correct: 0, explanation: "text-transform: uppercase converts text to uppercase. lowercase and capitalize also use this property." },
-      { question: "What does the font shorthand <code>font: bold 14px/1.5 Arial</code> specify?", options: ["style weight size/line-height family", "weight style size/line-height family", "size weight style family", "weight size family line-height"], correct: 0, explanation: "The font shorthand order: style, weight, size/line-height, family. Here size=14px, line-height=1.5, family=Arial." }
+      { question: "What is the line-height in <code>font: bold 14px/1.5 Arial</code>?", options: ["1.5 (unitless)", "14px", "bold", "Arial"], correct: 0, explanation: "The slash introduces line-height after font-size: here size=14px and line-height=1.5. Optional style/weight/variant/stretch values precede the required size and family; their order is not rigidly style then weight." }
     ]
   },
 
@@ -1038,11 +1038,11 @@ transition: opacity 0.5s ease, transform 0.3s;  <span class="comment">/* multipl
   <li>Use will-change only after measuring a problem, on a few elements, and remove it when no longer needed</li>
 </ul>
 <div class="code-block">
-<span class="comment">/* Good: GPU-friendly */</span>
+<span class="comment">/* Often efficient; profile the actual result */</span>
 transform: translateX(100px);
 opacity: 0.5;
 
-<span class="comment">/* Bad: causes layout thrashing */</span>
+<span class="comment">/* Changes can require layout; this alone is not layout thrashing */</span>
 left: 100px;
 width: 200px;
 </div>`
