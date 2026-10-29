@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project dashboard · CSS capstone</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to project overview</a>
+  <header class="site-header"><p class="brand">Fieldnotes <span>Project workspace</span></p><a href="../../index.html">Back to course</a></header>
+  <div class="app-layout">
+    <nav aria-label="Project sections">
+      <h2>Workspace</h2>
+      <ul><li><a href="#overview" aria-current="page">Overview</a></li><li><a href="#tasks">Tasks</a></li><li><a href="#notes">Notes</a></li></ul>
+      <p class="demo-note">Static learning example. Data is illustrative; no information is saved.</p>
+    </nav>
+    <main id="main" tabindex="-1">
+      <section id="overview" aria-labelledby="overview-title">
+        <div class="toolbar"><div><p class="eyebrow">Wednesday workspace</p><h1 id="overview-title">A little more clarity.</h1></div><span class="badge">3 projects active</span></div>
+        <p class="lede">A responsive dashboard built with semantic HTML, local CSS, and a layout that gives content room to grow.</p>
+        <div class="stats" aria-label="Project summary">
+          <article class="panel stat"><h2>Planned tasks</h2><p class="metric">12</p><p>For this week</p></article>
+          <article class="panel stat"><h2>Completed</h2><p class="metric">9</p><p>Ready to share</p></article>
+          <article class="panel stat"><h2>In review</h2><p class="metric">3</p><p>Awaiting feedback</p></article>
+        </div>
+      </section>
+      <section class="panel" id="tasks" aria-labelledby="tasks-title">
+        <div class="toolbar"><h2 id="tasks-title">Current work</h2><span class="muted">Illustrative task list</span></div>
+        <form class="filters" action="#tasks" method="get" aria-label="Filter demonstration">
+          <div class="field"><label for="search">Search tasks</label><input id="search" name="q" type="search" placeholder="Example: review" aria-describedby="filter-help"></div>
+          <div class="field"><label for="status">Status</label><select id="status" name="status"><option>All statuses</option><option>Planned</option><option>In review</option></select></div>
+          <p id="filter-help">Form styling demonstration only. This static page does not filter results.</p>
+        </form>
+        <ul class="task-list">
+          <li><span><strong>Review the component library</strong><small>Design systems · due Friday</small></span><span class="badge">In review</span></li>
+          <li><span><strong>Test long_translated_project_names_and_layout_overflow</strong><small>Quality checks · due next week</small></span><span class="badge">Planned</span></li>
+          <li><span><strong>Publish keyboard navigation notes</strong><small>Documentation · ready for review</small></span><span class="badge">In review</span></li>
+        </ul>
+      </section>
+      <section class="summary-host" id="notes" aria-labelledby="notes-title"><article class="panel summary"><div><p class="eyebrow">Build with care</p><h2 id="notes-title">Content sets the pace.</h2></div><div><p>This component responds to its own container. Resize the page, change text size, or inspect it in a narrower layout.</p><a href="../../docs/course-review.md">Read the course review</a></div></article></section>
+    </main>
+  </div>
+  <footer>CSS refresher capstone · No remote fonts, images, scripts, or services.</footer>
+</body>
+</html>
